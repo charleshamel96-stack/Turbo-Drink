@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turbo Drink</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Press Start 2P', cursive; }
+
+    @keyframes pixelPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes pixelFlash {
+      0% { opacity: 0; transform: translateY(10px); }
+      50% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+
+    .pulse { animation: pixelPulse 1.5s infinite; }
+
+    .pixel-effect::after {
+      content: '⚡';
+      position: absolute;
+      left: 50%;
+      top: -10px;
+      animation: pixelFlash 1.2s infinite;
+    }
+
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-[#0b1d3a] min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-md w-full bg-[#7a0000] rounded-2xl shadow-2xl p-6 border-4 border-yellow-400 relative">
+
+    <h1 class="text-yellow-300 text-center text-lg mb-4">⚡ TURBO DRINK ⚡</h1>
+    <p class="text-center text-yellow-200 text-xs mb-6">12 PACK – 33.99$ TOUT INCLUS</p>
+
+    <div class="text-center mb-8">
+      <button onclick="allerSaveurs()" class="pulse bg-yellow-400 text-[#0b1d3a] px-4 py-3 rounded-xl text-xs relative pixel-effect">
+        COMMANDER ⚡
+      </button>
+    </div>
+
+    <div id="section-saveurs">
+      <img src="pack.jpg" class="rounded-xl mb-4 border-2 border-yellow-400" alt="Pack Turbo Drink">
+
+      <label class="block text-yellow-200 text-xs mb-2">CHOISIS TES SAVEURS :</label>
+      <select id="saveurs" class="w-full border-2 border-yellow-400 rounded-lg p-2 mb-4 bg-[#0b1d3a] text-yellow-200" multiple>
+        <option>Monster Original</option>
+        <option>Monster Ultra</option>
+        <option>Monster Mango</option>
+        <option>Rockstar Original</option>
+        <option>Rockstar Punched</option>
+        <option>Rockstar Blueberry</option>
+      </select>
+
+      <div class="bg-[#0b1d3a] rounded-lg p-3 mb-4 border-2 border-yellow-400">
+        <p class="text-yellow-200 text-xs">COMMANDE :</p>
+        <p id="resume" class="text-yellow-300 text-xs">AUCUNE SAVEUR</p>
+        <p class="text-yellow-300 text-xs mt-2">TOTAL : 33.99$</p>
+      </div>
+
+      <button onclick="commanderMessenger()" class="w-full bg-yellow-400 text-[#0b1d3a] rounded-xl py-3 mb-3 text-xs">MESSENGER</button>
+      <button onclick="commanderSMS()" class="w-full bg-blue-900 text-yellow-300 rounded-xl py-3 text-xs">TEXTO</button>
+    </div>
+
+    <p class="text-[8px] text-yellow-200 mt-4 text-center">REMPLACE LES LIENS MESSENGER ET NUMÉRO AVANT PUBLICATION</p>
+  </div>
+
+  <script>
+    const select = document.getElementById('saveurs');
+    const resume = document.getElementById('resume');
+
+    select.addEventListener('change', () => {
+      const values = Array.from(select.selectedOptions).map(o => o.value);
+      resume.textContent = values.length ? values.join(', ') : 'AUCUNE SAVEUR';
+    });
+
+    function allerSaveurs() {
+      document.getElementById('section-saveurs').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function getCommande() {
+      const values = Array.from(select.selectedOptions).map(o => o.value);
+      const liste = values.length ? values.join(', ') : 'Mix maison';
+      return encodeURIComponent(`Commande Turbo Drink - 12 Pack (33.99$)\\nSaveurs: ${liste}`);
+    }
+
+    function commanderMessenger() {
+      const msg = getCommande();
+      window.open(`https://m.me/yourpage?ref=${msg}`, '_blank');
+    }
+
+    function commanderSMS() {
+      const msg = getCommande();
+      window.location.href = `sms:+15141234567?&body=${msg}`;
+    }
+  </script>
+</body>
+</html>
