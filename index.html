@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Turbo Drink - Mobile Prototype</title>
+  <title>Turbo Drink - Mobile Prototype Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: Arial, sans-serif; background: linear-gradient(to right, #ffefba, #fff8f0); }
-    .section { max-width: 500px; margin: 20px auto; padding: 15px; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .section { max-width: 500px; margin: 20px auto; padding: 15px; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
     h1 { text-align: center; color: #ff6b6b; margin-bottom: 15px; }
-    .product-card { display: flex; justify-content: space-between; align-items: center; background: #fff3e0; padding: 10px; border-radius: 15px; margin-bottom: 10px; }
+    .product-card { display: flex; justify-content: space-between; align-items: center; background: #fff3e0; padding: 10px; border-radius: 15px; margin-bottom: 12px; transition: transform 0.2s, box-shadow 0.2s; }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
     .product-info { display: flex; align-items: center; }
-    .logo { width: 50px; height: 50px; background: #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin-right: 10px; }
+    .logo { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin-right: 12px; font-size: 14px; background-size: cover; background-position: center; }
     .qty-controls { display: flex; align-items: center; gap: 5px; }
     .btn { padding: 6px 12px; border-radius: 12px; font-weight: bold; cursor: pointer; }
     .btn-add { background: #ff6b6b; color: white; }
@@ -62,15 +63,14 @@
 
   <script>
     const products = [
-      {brand: 'Monster', flavor: 'Original'},
-      {brand: 'Monster', flavor: 'Ultra'},
-      {brand: 'Rockstar', flavor: 'Original'},
-      {brand: 'Rockstar', flavor: 'Punched'}
+      {brand: 'Monster', flavor: 'Original', img: 'https://via.placeholder.com/60x60?text=M'},
+      {brand: 'Monster', flavor: 'Ultra', img: 'https://via.placeholder.com/60x60?text=MU'},
+      {brand: 'Rockstar', flavor: 'Original', img: 'https://via.placeholder.com/60x60?text=R'},
+      {brand: 'Rockstar', flavor: 'Punched', img: 'https://via.placeholder.com/60x60?text=RP'}
     ];
 
     const productList = document.getElementById('product-list');
     const cartSummary = document.getElementById('cart-summary');
-
     let cart = {};
 
     products.forEach((p, index) => {
@@ -78,7 +78,7 @@
       card.className = 'product-card';
       card.innerHTML = `
         <div class='product-info'>
-          <div class='logo'>${p.brand[0]}</div>
+          <div class='logo' style='background-image:url(${p.img})'></div>
           <div>${p.brand} ${p.flavor}</div>
         </div>
         <div class='qty-controls'>
@@ -112,9 +112,7 @@
       cartSummary.textContent = items.length ? items.join(', ') + ` | Total: ${totalCans} canettes` : 'Aucune canette sélectionnée';
     }
 
-    function genererNumeroCommande() {
-      return 'TDB-' + Date.now();
-    }
+    function genererNumeroCommande() { return 'TDB-' + Date.now(); }
 
     function allerVersPaiement() {
       const selectedCans = Object.values(cart).reduce((a,b) => a+b,0);
