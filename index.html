@@ -1,165 +1,133 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Turbo Drink</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turbo Drink - Commande</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Press Start 2P', cursive; background: radial-gradient(circle at top, #ffedbc, #ff6b6b); }
-
-    @keyframes pulseButton {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-
-    .pulse { animation: pulseButton 1.5s infinite; }
-
-    .fruit { display: inline-block; opacity: 0.9; font-size: 1.2rem; }
-
-    html { scroll-behavior: smooth; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(to right, #ffefba, #ffffff); }
+    .fruit { font-size: 1.5rem; margin-right: 5px; }
+    .btn { padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .btn-order { background: #ff6b6b; color: white; }
+    .btn-next { background: #feca57; color: #333; margin-top: 20px; }
+    .section { max-width: 500px; margin: auto; padding: 20px; background: #fff8f0; border-radius: 20px; margin-top: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #ff6b6b; }
+    select, input, textarea { width: 100%; padding: 8px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    .resume { margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 12px; font-weight: bold; }
+    .star { font-size: 2rem; cursor: pointer; color: #ccc; }
+    .star.selected { color: #ff6b6b; }
   </style>
 </head>
-<body class="min-h-screen flex">
+<body>
 
-  <!-- Barre d'onglets à gauche -->
-  <div class="w-40 bg-gray-800 text-white flex flex-col p-4 space-y-2">
-    <button onclick="showTab('non-melange')" class="px-2 py-2 bg-gray-700 rounded hover:bg-gray-600">Caisse de 12 - Non mélangé 31.99$</button>
-    <button onclick="showTab('melange')" class="px-2 py-2 bg-gray-700 rounded hover:bg-gray-600">Caisse de 12 Turbo Drink (Mélangé)</button>
+  <!-- Étape 1 : Choix des saveurs -->
+  <div class="section" id="etape1">
+    <h1>Choisis tes saveurs</h1>
+    <p>Construis ton pack de 12 boissons :</p>
+    <div id="saveur-list"></div>
+    <div class="resume" id="resume">Aucune saveur sélectionnée</div>
+    <button class="btn btn-next" onclick="allerVersPaiement()">Continuer vers paiement</button>
   </div>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 p-6 overflow-y-auto">
+  <!-- Étape 2 : Paiement par virement -->
+  <div class="section hidden" id="etape2">
+    <h1>Paiement par virement</h1>
+    <p><strong>Numéro de commande :</strong> <span id="num-commande"></span></p>
+    <p><strong>Résumé de votre commande :</strong></p>
+    <p id="resume-paiement"></p>
+    <p><strong>Montant total :</strong> 33.99$</p>
+    <p><strong>Effectuez le paiement à :</strong> <span style="color:#ff6b6b;">shop.turbodrink@proton.me</span></p>
+    <p><em>⚠️ Important : indiquez le numéro de commande dans le message du virement.</em></p>
+    <button class="btn btn-next" onclick="allerVersMerci()">J'ai payé</button>
+  </div>
 
-    <!-- Onglet Non mélangé -->
-    <div id="non-melange">
-      <h1 class="text-3xl font-bold mb-4 text-gray-900">Caisse de 12 - Non mélangé</h1>
-      <p class="mb-4">Chaque pack contient 12 boissons identiques, prix : 31.99$</p>
-      <div class="grid grid-cols-3 gap-2 mb-4">
-        <span class="fruit">🥤</span>
-        <span class="fruit">🥤</span>
-        <span class="fruit">🥤</span>
-      </div>
-      <!-- Ici tu peux ajouter la sélection d'une saveur unique pour le pack -->
-      <select id="saveur-non-melange" class="w-full border-2 border-gray-400 rounded-lg p-2 mb-4 text-gray-700">
-        <option>Monster Original</option>
-        <option>Monster Ultra</option>
-        <option>Monster Mango</option>
-        <option>Rockstar Original</option>
-        <option>Rockstar Punched</option>
-        <option>Rockstar Blueberry</option>
-      </select>
-      <button onclick="commanderSMSNonMelange()" class="w-full bg-yellow-400 text-gray-900 rounded-xl py-3 text-sm mb-4">Commander par SMS</button>
-      <button onclick="commanderMessengerNonMelange()" class="w-full bg-red-500 text-white rounded-xl py-3 text-sm">Commander par Messenger</button>
+  <!-- Étape 3 : Page de remerciement + note -->
+  <div class="section hidden" id="etape3">
+    <h1>Merci pour votre commande !</h1>
+    <p>Numéro de commande : <span id="num-commande-merci"></span></p>
+    <p>Laissez votre note :</p>
+    <div id="stars" class="mb-3">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
     </div>
-
-    <!-- Onglet Mélangé -->
-    <div id="melange" class="hidden">
-      <h1 class="text-3xl font-bold mb-4 text-gray-900">Caisse de 12 Turbo Drink (Mélangé)</h1>
-      <p class="mb-4">Crée ton pack personnalisé avec les 12 boissons de ton choix, prix : 33.99$</p>
-      <div class="grid grid-cols-3 gap-2 mb-4">
-        <span class="fruit">🍓</span>
-        <span class="fruit">🍋</span>
-        <span class="fruit">🍊</span>
-      </div>
-
-      <label class="block text-gray-700 font-semibold mb-2">CHOISIS TES SAVEURS ET QUANTITÉ (jusqu'à 12) :</label>
-      <div id="saveur-list" class="grid grid-cols-1 gap-2 max-h-96 overflow-y-scroll mb-4 border-2 border-gray-400 rounded-lg p-2"></div>
-
-      <div class="bg-gray-100 rounded-lg p-3 mb-4 border-2 border-gray-400">
-        <p class="text-gray-700 text-xs">COMMANDE :</p>
-        <p id="resume" class="text-gray-800 text-xs">AUCUNE SAVEUR</p>
-        <p class="text-gray-800 text-xs mt-2">TOTAL : 33.99$</p>
-      </div>
-
-      <button onclick="commanderMessenger()" class="w-full bg-red-500 text-white rounded-xl py-3 mb-3 text-sm">MESSENGER</button>
-      <button onclick="commanderSMS()" class="w-full bg-yellow-400 text-gray-900 rounded-xl py-3 text-sm">TEXTO</button>
-    </div>
-
+    <textarea id="commentaire" rows="3" placeholder="Commentaire facultatif..."></textarea>
+    <button class="btn btn-next mt-3" onclick="soumettreAvis()">Soumettre</button>
+    <button class="btn btn-order mt-3" onclick="recommander()">Commander un autre pack</button>
   </div>
 
   <script>
-    function showTab(tab) {
-      document.getElementById('non-melange').classList.add('hidden');
-      document.getElementById('melange').classList.add('hidden');
-      document.getElementById(tab).classList.remove('hidden');
-    }
-
-    // Exemple simple pour le pack non mélangé
-    function commanderSMSNonMelange() {
-      const saveur = document.getElementById('saveur-non-melange').value;
-      const msg = encodeURIComponent(`Commande Turbo Drink - Caisse 12 Non mélangé (31.99$)\\nSaveur: ${saveur}`);
-      window.location.href = `sms:+15141234567?&body=${msg}`;
-    }
-
-    function commanderMessengerNonMelange() {
-      const saveur = document.getElementById('saveur-non-melange').value;
-      const msg = encodeURIComponent(`Commande Turbo Drink - Caisse 12 Non mélangé (31.99$)\\nSaveur: ${saveur}`);
-      window.open(`https://m.me/yourpage?ref=${msg}`, '_blank');
-    }
-
-    // Code pour le pack mélangé (existant)
-    const saveursArray = [
-      'Monster Original','Monster Ultra','Monster Mango','Monster Pipeline Punch','Monster Pacific Punch',
-      'Rockstar Original','Rockstar Punched','Rockstar Blueberry','Rockstar Tropical','Red Bull Original',
-      'Red Bull Tropical','Red Bull Peach','Red Bull Watermelon','Red Bull Blueberry','Monster Khaos',
-      'Monster Energy Assault','Monster Energy Ultra Sunrise','Monster Energy Ultra Red','Monster Energy Ultra Black','Monster Energy Ultra Violet',
-      'Monster Energy Ultra Paradise','Monster Energy Ultra Fiesta','Rockstar Energy Pomegranate','Rockstar Energy Watermelon','Rockstar Energy Citrus',
-      'Rockstar Energy Guava','Rockstar Energy Pineapple','Rockstar Energy Mango','Rockstar Energy Dragonfruit','Rockstar Energy Fruit Punch',
-      'Monster Energy Rehab Tea Lemonade','Monster Energy Rehab Tea Strawberry','Monster Energy Rehab Tea Peach','Monster Energy Rehab Tea Raspberry','Monster Energy Juice Monster Mango Loco',
-      'Monster Energy Juice Monster Pacific Punch','Monster Energy Juice Monster Pipeline Punch','Monster Energy Juice Monster Khaos','Red Bull Summer Edition Watermelon','Red Bull Summer Edition Coconut',
-      'Red Bull Summer Edition Tropical','Red Bull Summer Edition Berry','Red Bull Summer Edition Peach','Red Bull Summer Edition Lime','Rockstar Energy Sugar Free',
-      'Rockstar Energy Xdurance','Rockstar Energy Juiced','Rockstar Energy Pure Zero','Monster Energy Lo-Carb','Monster Energy Import',
-      'Monster Energy Ultra Fiesta','Monster Energy Ultra Blue','Monster Energy Ultra Red','Monster Energy Ultra Sunrise','Monster Energy Ultra Violet','Monster Energy Ultra Black','Monster Energy Ultra Paradise','Monster Energy Assault','Monster Energy Import Red','Monster Energy Import Mango','Monster Energy Import Pacific Punch'
-    ];
-
+    const saveursArray = ['Monster Original','Monster Ultra','Monster Mango','Rockstar Original','Rockstar Punched','Rockstar Blueberry','Red Bull Peach','Red Bull Tropical','Red Bull Watermelon'];
     const saveurList = document.getElementById('saveur-list');
 
     saveursArray.forEach(s => {
       const div = document.createElement('div');
-      div.className = 'flex justify-between items-center p-1 border-b border-gray-300';
-      div.innerHTML = `<span>${s}</span><input type='number' min='0' max='12' value='0' class='w-12 text-center border border-gray-400 rounded'/>`;
+      div.className = 'flex justify-between items-center mt-2';
+      div.innerHTML = `<span class='fruit'>🍹</span><span>${s}</span><input type='number' min='0' max='12' value='0' class='qty-input'/>`;
       saveurList.appendChild(div);
     });
 
     function updateResume() {
       const selections = [];
-      saveurList.querySelectorAll('div').forEach(div => {
-        const name = div.querySelector('span').textContent;
-        const qty = parseInt(div.querySelector('input').value);
-        if(qty>0) selections.push(`${name} x${qty}`);
+      document.querySelectorAll('.qty-input').forEach((input, i) => {
+        const qty = parseInt(input.value);
+        if(qty > 0) selections.push(`${saveursArray[i]} x${qty}`);
       });
-      document.getElementById('resume').textContent = selections.length ? selections.join(', ') : 'AUCUNE SAVEUR';
+      document.getElementById('resume').textContent = selections.length ? selections.join(', ') : 'Aucune saveur sélectionnée';
+      return selections;
     }
 
-    saveurList.addEventListener('input', updateResume);
+    document.querySelectorAll('.qty-input').forEach(input => input.addEventListener('input', updateResume));
 
-    function allerSaveurs() {
-      document.getElementById('melange').scrollIntoView({ behavior: 'smooth' });
+    function genererNumeroCommande() {
+      return 'TDB-' + Date.now();
     }
 
-    function getCommande() {
-      const selections = [];
-      saveurList.querySelectorAll('div').forEach(div => {
-        const name = div.querySelector('span').textContent;
-        const qty = parseInt(div.querySelector('input').value);
-        if(qty>0) selections.push(`${name} x${qty}`);
+    function allerVersPaiement() {
+      const selections = updateResume();
+      if(selections.length === 0) { alert('Veuillez sélectionner au moins une saveur.'); return; }
+      const numero = genererNumeroCommande();
+      document.getElementById('num-commande').textContent = numero;
+      document.getElementById('resume-paiement').textContent = selections.join(', ');
+      document.getElementById('etape1').classList.add('hidden');
+      document.getElementById('etape2').classList.remove('hidden');
+      // Sauvegarder temporairement le numéro et sélection pour la page merci
+      window.currentCommande = { numero: numero, selections: selections };
+    }
+
+    function allerVersMerci() {
+      document.getElementById('etape2').classList.add('hidden');
+      document.getElementById('etape3').classList.remove('hidden');
+      document.getElementById('num-commande-merci').textContent = window.currentCommande.numero;
+    }
+
+    // Gestion des étoiles
+    const stars = document.querySelectorAll('.star');
+    let noteSelectionnee = 0;
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        noteSelectionnee = parseInt(star.dataset.value);
+        stars.forEach(s => s.classList.toggle('selected', parseInt(s.dataset.value) <= noteSelectionnee));
       });
-      const liste = selections.length ? selections.join(', ') : 'Mix maison';
-      return encodeURIComponent(`Commande Turbo Drink - Pack personnalisé (33.99$)\\nSaveurs: ${liste}`);
+    });
+
+    function soumettreAvis() {
+      const commentaire = document.getElementById('commentaire').value;
+      alert(`Merci pour votre avis !\nNote: ${noteSelectionnee} étoiles\nCommentaire: ${commentaire}`);
+      recommander();
     }
 
-    function commanderMessenger() {
-      const msg = getCommande();
-      window.open(`https://m.me/yourpage?ref=${msg}`, '_blank');
-    }
-
-    function commanderSMS() {
-      const msg = getCommande();
-      window.location.href = `sms:+15141234567?&body=${msg}`;
+    function recommander() {
+      // Réinitialiser inputs et retourner aux onglets pour nouvelle commande
+      document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
+      updateResume();
+      document.getElementById('etape3').classList.add('hidden');
+      document.getElementById('etape1').classList.remove('hidden');
     }
   </script>
+
 </body>
 </html>
