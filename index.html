@@ -22,33 +22,51 @@
     html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex">
 
-  <div class="max-w-xl w-full bg-white rounded-3xl shadow-2xl p-6 relative overflow-hidden">
+  <!-- Barre d'onglets à gauche -->
+  <div class="w-40 bg-gray-800 text-white flex flex-col p-4 space-y-2">
+    <button onclick="showTab('non-melange')" class="px-2 py-2 bg-gray-700 rounded hover:bg-gray-600">Caisse de 12 - Non mélangé 31.99$</button>
+    <button onclick="showTab('melange')" class="px-2 py-2 bg-gray-700 rounded hover:bg-gray-600">Caisse de 12 Turbo Drink (Mélangé)</button>
+  </div>
 
-    <h1 class="text-center text-3xl font-bold mb-4 text-gradient bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600">⚡ TURBO DRINK ⚡</h1>
-    <p class="text-center text-gray-700 mb-6">Crée ton pack de 12 boissons – 33.99$ tout inclus</p>
+  <!-- Contenu principal -->
+  <div class="flex-1 p-6 overflow-y-auto">
 
-    <div class="text-center mb-6">
-      <button onclick="allerSaveurs()" class="pulse bg-gradient-to-r from-red-500 via-yellow-400 to-pink-500 text-white px-6 py-3 rounded-2xl text-lg">
-        COMMANDER ⚡
-      </button>
+    <!-- Onglet Non mélangé -->
+    <div id="non-melange">
+      <h1 class="text-3xl font-bold mb-4 text-gray-900">Caisse de 12 - Non mélangé</h1>
+      <p class="mb-4">Chaque pack contient 12 boissons identiques, prix : 31.99$</p>
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <span class="fruit">🥤</span>
+        <span class="fruit">🥤</span>
+        <span class="fruit">🥤</span>
+      </div>
+      <!-- Ici tu peux ajouter la sélection d'une saveur unique pour le pack -->
+      <select id="saveur-non-melange" class="w-full border-2 border-gray-400 rounded-lg p-2 mb-4 text-gray-700">
+        <option>Monster Original</option>
+        <option>Monster Ultra</option>
+        <option>Monster Mango</option>
+        <option>Rockstar Original</option>
+        <option>Rockstar Punched</option>
+        <option>Rockstar Blueberry</option>
+      </select>
+      <button onclick="commanderSMSNonMelange()" class="w-full bg-yellow-400 text-gray-900 rounded-xl py-3 text-sm mb-4">Commander par SMS</button>
+      <button onclick="commanderMessengerNonMelange()" class="w-full bg-red-500 text-white rounded-xl py-3 text-sm">Commander par Messenger</button>
     </div>
 
-    <div id="section-saveurs" class="w-full">
+    <!-- Onglet Mélangé -->
+    <div id="melange" class="hidden">
+      <h1 class="text-3xl font-bold mb-4 text-gray-900">Caisse de 12 Turbo Drink (Mélangé)</h1>
+      <p class="mb-4">Crée ton pack personnalisé avec les 12 boissons de ton choix, prix : 33.99$</p>
       <div class="grid grid-cols-3 gap-2 mb-4">
-        <!-- Exemples de fruits avec style pixel subtil -->
         <span class="fruit">🍓</span>
         <span class="fruit">🍋</span>
         <span class="fruit">🍊</span>
-        <span class="fruit">🍇</span>
-        <span class="fruit">🍒</span>
       </div>
 
       <label class="block text-gray-700 font-semibold mb-2">CHOISIS TES SAVEURS ET QUANTITÉ (jusqu'à 12) :</label>
-      <div id="saveur-list" class="grid grid-cols-1 gap-2 max-h-96 overflow-y-scroll mb-4 border-2 border-gray-400 rounded-lg p-2">
-        <!-- Chaque saveur avec quantité -->
-      </div>
+      <div id="saveur-list" class="grid grid-cols-1 gap-2 max-h-96 overflow-y-scroll mb-4 border-2 border-gray-400 rounded-lg p-2"></div>
 
       <div class="bg-gray-100 rounded-lg p-3 mb-4 border-2 border-gray-400">
         <p class="text-gray-700 text-xs">COMMANDE :</p>
@@ -60,10 +78,29 @@
       <button onclick="commanderSMS()" class="w-full bg-yellow-400 text-gray-900 rounded-xl py-3 text-sm">TEXTO</button>
     </div>
 
-    <p class="text-[8px] text-gray-700 mt-4 text-center">REMPLACE LES LIENS MESSENGER ET NUMÉRO AVANT PUBLICATION</p>
   </div>
 
   <script>
+    function showTab(tab) {
+      document.getElementById('non-melange').classList.add('hidden');
+      document.getElementById('melange').classList.add('hidden');
+      document.getElementById(tab).classList.remove('hidden');
+    }
+
+    // Exemple simple pour le pack non mélangé
+    function commanderSMSNonMelange() {
+      const saveur = document.getElementById('saveur-non-melange').value;
+      const msg = encodeURIComponent(`Commande Turbo Drink - Caisse 12 Non mélangé (31.99$)\\nSaveur: ${saveur}`);
+      window.location.href = `sms:+15141234567?&body=${msg}`;
+    }
+
+    function commanderMessengerNonMelange() {
+      const saveur = document.getElementById('saveur-non-melange').value;
+      const msg = encodeURIComponent(`Commande Turbo Drink - Caisse 12 Non mélangé (31.99$)\\nSaveur: ${saveur}`);
+      window.open(`https://m.me/yourpage?ref=${msg}`, '_blank');
+    }
+
+    // Code pour le pack mélangé (existant)
     const saveursArray = [
       'Monster Original','Monster Ultra','Monster Mango','Monster Pipeline Punch','Monster Pacific Punch',
       'Rockstar Original','Rockstar Punched','Rockstar Blueberry','Rockstar Tropical','Red Bull Original',
@@ -83,10 +120,7 @@
     saveursArray.forEach(s => {
       const div = document.createElement('div');
       div.className = 'flex justify-between items-center p-1 border-b border-gray-300';
-      div.innerHTML = `
-        <span>${s}</span>
-        <input type='number' min='0' max='12' value='0' class='w-12 text-center border border-gray-400 rounded'/>
-      `;
+      div.innerHTML = `<span>${s}</span><input type='number' min='0' max='12' value='0' class='w-12 text-center border border-gray-400 rounded'/>`;
       saveurList.appendChild(div);
     });
 
@@ -97,13 +131,13 @@
         const qty = parseInt(div.querySelector('input').value);
         if(qty>0) selections.push(`${name} x${qty}`);
       });
-      resume.textContent = selections.length ? selections.join(', ') : 'AUCUNE SAVEUR';
+      document.getElementById('resume').textContent = selections.length ? selections.join(', ') : 'AUCUNE SAVEUR';
     }
 
     saveurList.addEventListener('input', updateResume);
 
     function allerSaveurs() {
-      document.getElementById('section-saveurs').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('melange').scrollIntoView({ behavior: 'smooth' });
     }
 
     function getCommande() {
@@ -114,7 +148,7 @@
         if(qty>0) selections.push(`${name} x${qty}`);
       });
       const liste = selections.length ? selections.join(', ') : 'Mix maison';
-      return encodeURIComponent(`Commande Turbo Drink - Pack personnalisé (33.99$)\nSaveurs: ${liste}`);
+      return encodeURIComponent(`Commande Turbo Drink - Pack personnalisé (33.99$)\\nSaveurs: ${liste}`);
     }
 
     function commanderMessenger() {
