@@ -3,156 +3,156 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Turbo Drink - Mobile Prototype Pro</title>
+  <title>Turbo Drink - Prototype Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: linear-gradient(to right, #ffefba, #fff8f0); }
-    .section { max-width: 500px; margin: 20px auto; padding: 15px; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-    h1 { text-align: center; color: #ff6b6b; margin-bottom: 15px; }
-    .product-card { display: flex; justify-content: space-between; align-items: center; background: #fff3e0; padding: 10px; border-radius: 15px; margin-bottom: 12px; transition: transform 0.2s, box-shadow 0.2s; }
-    .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
-    .product-info { display: flex; align-items: center; }
-    .logo { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin-right: 12px; font-size: 14px; background-size: cover; background-position: center; }
+    body { font-family: 'Arial', sans-serif; background: linear-gradient(to right, #ffe259, #ffa751); margin:0; padding:0; }
+    .section { max-width: 500px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+    h1 { text-align: center; color: #ff4d4d; font-size: 1.6rem; margin-bottom: 20px; }
+    .product-card { display: flex; justify-content: space-between; align-items: center; background: #fff7e6; padding: 15px; border-radius: 20px; margin-bottom: 15px; transition: transform 0.2s, box-shadow 0.2s; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.25); }
+    .product-info { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 60px; height: 60px; border-radius: 15px; background-size: cover; background-position: center; flex-shrink:0; }
     .qty-controls { display: flex; align-items: center; gap: 5px; }
     .btn { padding: 6px 12px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-    .btn-add { background: #ff6b6b; color: white; }
-    .btn-remove { background: #feca57; color: #333; }
-    .btn-next { background: #1dd1a1; color: white; margin-top: 10px; width: 100%; padding: 12px; border-radius: 15px; font-weight: bold; }
-    .cart-summary { margin-top: 15px; padding: 10px; background: #dff9fb; border-radius: 12px; font-weight: bold; }
+    .btn-add { background: #ff4d4d; color: white; }
+    .btn-remove { background: #ffd700; color: #333; }
+    .btn-next { background: #1dd1a1; color: white; margin-top: 15px; width: 100%; padding: 15px; border-radius: 20px; font-weight: bold; font-size: 1rem; }
+    .cart-summary { margin-top: 15px; padding: 12px; background: #dff9fb; border-radius: 15px; font-weight: bold; }
     .hidden { display: none; }
+    .star { font-size: 1.5rem; cursor: pointer; color: #ccc; }
+    .star.selected { color: #ffcc00; }
   </style>
 </head>
 <body>
 
-  <!-- Étape 1 : Sélection des produits -->
-  <div class="section" id="selection">
-    <h1>Crée ton pack Turbo Drink</h1>
-    <div id="product-list"></div>
-    <div class="cart-summary" id="cart-summary">Aucune canette sélectionnée</div>
-    <button class="btn-next" onclick="allerVersPaiement()">Continuer vers paiement</button>
-  </div>
+<div class="section" id="selection">
+  <h1>Crée ton pack Turbo Drink</h1>
+  <div id="product-list" class="flex flex-col"></div>
+  <div class="cart-summary" id="cart-summary">Aucune canette sélectionnée</div>
+  <button class="btn-next" onclick="allerVersPaiement()">Continuer vers paiement</button>
+</div>
 
-  <!-- Étape 2 : Paiement -->
-  <div class="section hidden" id="paiement">
-    <h1>Paiement par virement</h1>
-    <p><strong>Numéro de commande :</strong> <span id="order-number"></span></p>
-    <p><strong>Résumé :</strong></p>
-    <p id="order-summary"></p>
-    <p><strong>Montant total :</strong> 33.99$</p>
-    <p>Payer à : <span style="color:#ff6b6b;">shop.turbodrink@proton.me</span></p>
-    <p><em>Indiquez le numéro de commande dans le message du virement.</em></p>
-    <button class="btn-next" onclick="allerVersMerci()">J'ai payé</button>
-  </div>
+<div class="section hidden" id="paiement">
+  <h1>Paiement par virement</h1>
+  <p><strong>Numéro de commande :</strong> <span id="order-number"></span></p>
+  <p><strong>Résumé :</strong></p>
+  <p id="order-summary"></p>
+  <p><strong>Montant total :</strong> 33.99$</p>
+  <p>Payer à : <span style="color:#ff4d4d;">shop.turbodrink@proton.me</span></p>
+  <p><em>Indiquez le numéro de commande dans le message du virement.</em></p>
+  <button class="btn-next" onclick="allerVersMerci()">J'ai payé</button>
+</div>
 
-  <!-- Étape 3 : Remerciement et avis -->
-  <div class="section hidden" id="merci">
-    <h1>Merci pour votre commande !</h1>
-    <p>Numéro de commande : <span id="order-number-thank"></span></p>
-    <p>Notez votre expérience :</p>
-    <div id="stars" class="mb-3">
-      <span class="star" data-value="1">★</span>
-      <span class="star" data-value="2">★</span>
-      <span class="star" data-value="3">★</span>
-      <span class="star" data-value="4">★</span>
-      <span class="star" data-value="5">★</span>
+<div class="section hidden" id="merci">
+  <h1>Merci pour votre commande !</h1>
+  <p>Numéro de commande : <span id="order-number-thank"></span></p>
+  <p>Notez votre expérience :</p>
+  <div id="stars" class="mb-3">
+    <span class="star" data-value="1">★</span>
+    <span class="star" data-value="2">★</span>
+    <span class="star" data-value="3">★</span>
+    <span class="star" data-value="4">★</span>
+    <span class="star" data-value="5">★</span>
+  </div>
+  <textarea id="comment" rows="3" placeholder="Commentaire facultatif..."></textarea>
+  <button class="btn-next mt-3" onclick="submitReview()">Soumettre</button>
+  <button class="btn-add mt-3" onclick="recommencer()">Commander un autre pack</button>
+</div>
+
+<script>
+const products = [
+  {brand: 'Monster', flavor: 'Original', img: 'https://www.clipartmax.com/png/middle/313-3135563_monster-energy-drink-logo-png.png'},
+  {brand: 'Monster', flavor: 'Ultra', img: 'https://www.clipartmax.com/png/middle/313-3135563_monster-energy-drink-logo-png.png'},
+  {brand: 'Monster', flavor: 'Pipeline Punch', img: 'https://www.clipartmax.com/png/middle/313-3135563_monster-energy-drink-logo-png.png'},
+  {brand: 'Rockstar', flavor: 'Original', img: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/Rockstar_energy_drink_logo.png'},
+  {brand: 'Rockstar', flavor: 'Punched', img: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/Rockstar_energy_drink_logo.png'},
+];
+
+const productList = document.getElementById('product-list');
+const cartSummary = document.getElementById('cart-summary');
+let cart = {};
+
+products.forEach((p, index) => {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.innerHTML = `
+    <div class='product-info'>
+      <div class='logo' style='background-image:url(${p.img});'></div>
+      <div>${p.brand} ${p.flavor}</div>
     </div>
-    <textarea id="comment" rows="3" placeholder="Commentaire facultatif..."></textarea>
-    <button class="btn-next mt-3" onclick="submitReview()">Soumettre</button>
-    <button class="btn-add mt-3" onclick="recommencer()">Commander un autre pack</button>
-  </div>
+    <div class='qty-controls'>
+      <button class='btn btn-remove' onclick='changeQty(${index}, -1)'>-</button>
+      <span id='qty-${index}'>0</span>
+      <button class='btn btn-add' onclick='changeQty(${index}, 1)'>+</button>
+    </div>
+  `;
+  productList.appendChild(card);
+  cart[index] = 0;
+});
 
-  <script>
-    const products = [
-      {brand: 'Monster', flavor: 'Original', img: 'https://via.placeholder.com/60x60?text=M'},
-      {brand: 'Monster', flavor: 'Ultra', img: 'https://via.placeholder.com/60x60?text=MU'},
-      {brand: 'Rockstar', flavor: 'Original', img: 'https://via.placeholder.com/60x60?text=R'},
-      {brand: 'Rockstar', flavor: 'Punched', img: 'https://via.placeholder.com/60x60?text=RP'}
-    ];
+function changeQty(index, delta) {
+  let newQty = cart[index] + delta;
+  if(newQty < 0) newQty = 0;
+  if(newQty > 12) newQty = 12;
+  cart[index] = newQty;
+  document.getElementById(`qty-${index}`).textContent = newQty;
+  updateCartSummary();
+}
 
-    const productList = document.getElementById('product-list');
-    const cartSummary = document.getElementById('cart-summary');
-    let cart = {};
-
-    products.forEach((p, index) => {
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      card.innerHTML = `
-        <div class='product-info'>
-          <div class='logo' style='background-image:url(${p.img})'></div>
-          <div>${p.brand} ${p.flavor}</div>
-        </div>
-        <div class='qty-controls'>
-          <button class='btn btn-remove' onclick='changeQty(${index}, -1)'>-</button>
-          <span id='qty-${index}'>0</span>
-          <button class='btn btn-add' onclick='changeQty(${index}, 1)'>+</button>
-        </div>
-      `;
-      productList.appendChild(card);
-      cart[index] = 0;
-    });
-
-    function changeQty(index, delta) {
-      let newQty = cart[index] + delta;
-      if(newQty < 0) newQty = 0;
-      if(newQty > 12) newQty = 12;
-      cart[index] = newQty;
-      document.getElementById(`qty-${index}`).textContent = newQty;
-      updateCartSummary();
+function updateCartSummary() {
+  const items = [];
+  let totalCans = 0;
+  products.forEach((p, i) => {
+    if(cart[i] > 0) {
+      items.push(`${p.brand} ${p.flavor} x${cart[i]}`);
+      totalCans += cart[i];
     }
+  });
+  cartSummary.textContent = items.length ? items.join(', ') + ` | Total: ${totalCans} canettes` : 'Aucune canette sélectionnée';
+}
 
-    function updateCartSummary() {
-      const items = [];
-      let totalCans = 0;
-      products.forEach((p, i) => {
-        if(cart[i] > 0) {
-          items.push(`${p.brand} ${p.flavor} x${cart[i]}`);
-          totalCans += cart[i];
-        }
-      });
-      cartSummary.textContent = items.length ? items.join(', ') + ` | Total: ${totalCans} canettes` : 'Aucune canette sélectionnée';
-    }
+function genererNumeroCommande() { return 'TDB-' + Date.now(); }
 
-    function genererNumeroCommande() { return 'TDB-' + Date.now(); }
+function allerVersPaiement() {
+  const selectedCans = Object.values(cart).reduce((a,b) => a+b,0);
+  if(selectedCans === 0) { alert('Sélectionnez au moins une canette.'); return; }
+  const numero = genererNumeroCommande();
+  document.getElementById('order-number').textContent = numero;
+  document.getElementById('order-summary').textContent = Object.entries(cart).filter(([i,q]) => q>0).map(([i,q]) => `${products[i].brand} ${products[i].flavor} x${q}`).join(', ');
+  document.getElementById('selection').classList.add('hidden');
+  document.getElementById('paiement').classList.remove('hidden');
+  window.currentOrder = {numero: numero, summary: document.getElementById('order-summary').textContent};
+}
 
-    function allerVersPaiement() {
-      const selectedCans = Object.values(cart).reduce((a,b) => a+b,0);
-      if(selectedCans === 0) { alert('Sélectionnez au moins une canette.'); return; }
-      const numero = genererNumeroCommande();
-      document.getElementById('order-number').textContent = numero;
-      document.getElementById('order-summary').textContent = Object.entries(cart).filter(([i,q]) => q>0).map(([i,q]) => `${products[i].brand} ${products[i].flavor} x${q}`).join(', ');
-      document.getElementById('selection').classList.add('hidden');
-      document.getElementById('paiement').classList.remove('hidden');
-      window.currentOrder = {numero: numero, summary: document.getElementById('order-summary').textContent};
-    }
+function allerVersMerci() {
+  document.getElementById('paiement').classList.add('hidden');
+  document.getElementById('merci').classList.remove('hidden');
+  document.getElementById('order-number-thank').textContent = window.currentOrder.numero;
+}
 
-    function allerVersMerci() {
-      document.getElementById('paiement').classList.add('hidden');
-      document.getElementById('merci').classList.remove('hidden');
-      document.getElementById('order-number-thank').textContent = window.currentOrder.numero;
-    }
+const stars = document.querySelectorAll('.star');
+let note = 0;
+stars.forEach(star => {
+  star.addEventListener('click', () => {
+    note = parseInt(star.dataset.value);
+    stars.forEach(s => s.classList.toggle('selected', parseInt(s.dataset.value) <= note));
+  });
+});
 
-    const stars = document.querySelectorAll('.star');
-    let note = 0;
-    stars.forEach(star => {
-      star.addEventListener('click', () => {
-        note = parseInt(star.dataset.value);
-        stars.forEach(s => s.classList.toggle('selected', parseInt(s.dataset.value) <= note));
-      });
-    });
+function submitReview() {
+  const comment = document.getElementById('comment').value;
+  alert(`Merci pour votre avis!\nNote: ${note} étoiles\nCommentaire: ${comment}`);
+  recommencer();
+}
 
-    function submitReview() {
-      const comment = document.getElementById('comment').value;
-      alert(`Merci pour votre avis!\nNote: ${note} étoiles\nCommentaire: ${comment}`);
-      recommencer();
-    }
-
-    function recommencer() {
-      Object.keys(cart).forEach(i => cart[i] = 0);
-      updateCartSummary();
-      document.getElementById('merci').classList.add('hidden');
-      document.getElementById('selection').classList.remove('hidden');
-    }
-  </script>
+function recommencer() {
+  Object.keys(cart).forEach(i => cart[i] = 0);
+  updateCartSummary();
+  document.getElementById('merci').classList.add('hidden');
+  document.getElementById('selection').classList.remove('hidden');
+}
+</script>
 
 </body>
 </html>
