@@ -3,198 +3,1398 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turbo Drink</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Turbo Drink ⚡ — Les Coteaux</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Arial', sans-serif; margin:0; padding:0; background: linear-gradient(to right, #ff4d4d, #ffb347); }
-  .section { max-width: 500px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); text-align:center; }
-  h1 { font-size: 1.8rem; margin-bottom: 15px; color:#ff4d4d; }
-  .btn { padding:12px 20px; margin:10px; border-radius:20px; font-weight:bold; cursor:pointer; transition:0.2s; }
-  .btn:hover { transform:scale(1.05); }
-  .btn-simpl { background:#1dd1a1; color:white; }
-  .btn-turbo { background:#ff6b6b; color:white; }
-  .btn-next { background:#576574; color:white; width:100%; padding:15px; border-radius:25px; font-weight:bold; font-size:1rem; margin-top:15px; }
-  .hidden { display:none; }
-  .stars { display:flex; justify-content:center; gap:5px; font-size:2.5rem; cursor:pointer; }
-  .star { color:#ccc; }
-  .star.selected { color:#ffcc00; }
-  .cart-summary { margin-top:15px; font-weight:bold; }
-  .product-select { margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #ddd; border-radius:15px; }
-  .product-select img { width:50px; border-radius:10px; }
-  .quantity { font-weight:bold; }
+:root {
+  --red: #e01010;
+  --red-dark: #9b0000;
+  --yellow: #ffd700;
+  --orange: #ff6a00;
+  --black: #0a0a0a;
+  --dark: #111;
+  --card: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #f0f0f0;
+  --muted: #999;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--black);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* EXPLOSION BG */
+.explosion-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,16,16,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,106,0,0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* RAY BURST */
+.ray-burst {
+  position: fixed;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200vw;
+  height: 200vw;
+  background: repeating-conic-gradient(
+    rgba(255,106,0,0.03) 0deg 10deg,
+    transparent 10deg 20deg
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: slowSpin 60s linear infinite;
+}
+@keyframes slowSpin { to { transform: translateX(-50%) rotate(360deg); } }
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--red);
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 30px rgba(224,16,16,0.3);
+}
+
+.logo {
+  font-family: 'Bangers', cursive;
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #fff 0%, var(--yellow) 50%, var(--orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255,106,0,0.5));
+}
+
+.logo-bolt { -webkit-text-fill-color: var(--yellow); filter: none; }
+
+.header-right { display: flex; align-items: center; gap: 1rem; }
+
+.cart-pill {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  border-radius: 100px;
+  font-family: 'Bangers', cursive;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 15px rgba(224,16,16,0.4);
+}
+.cart-pill:hover { box-shadow: 0 0 25px rgba(224,16,16,0.7); transform: scale(1.05); }
+.cart-badge {
+  background: var(--yellow);
+  color: #000;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  font-size: 0.75rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* PAGES */
+.page { display: none; position: relative; z-index: 1; }
+.page.active { display: block; }
+
+/* ===== PAGE 1 — CHOIX ===== */
+.hero {
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+  position: relative;
+}
+
+.hero-logo-img {
+  width: 200px;
+  margin: 0 auto 1rem;
+  display: block;
+  filter: drop-shadow(0 0 30px rgba(255,106,0,0.6));
+  animation: floatLogo 3s ease-in-out infinite;
+}
+@keyframes floatLogo {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero-address {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.3);
+  color: var(--yellow);
+  padding: 0.3rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-family: 'Bangers', cursive;
+  font-size: 2.2rem;
+  letter-spacing: 3px;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+.section-title span { color: var(--yellow); }
+
+.section-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 2.5rem;
+}
+
+/* OPTION CARDS */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+}
+
+.option-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.option-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.option-card.simplifiee::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,106,0,0.15), transparent 70%);
+}
+.option-card.turbo::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(224,16,16,0.2), transparent 70%);
+}
+.option-card:hover { transform: translateY(-6px); }
+.option-card:hover::before { opacity: 1; }
+.option-card.simplifiee:hover { border-color: var(--orange); box-shadow: 0 8px 40px rgba(255,106,0,0.25); }
+.option-card.turbo:hover { border-color: var(--red); box-shadow: 0 8px 40px rgba(224,16,16,0.35); }
+.option-card.selected.simplifiee { border-color: var(--orange); box-shadow: 0 0 30px rgba(255,106,0,0.4); }
+.option-card.selected.turbo { border-color: var(--red); box-shadow: 0 0 30px rgba(224,16,16,0.5); }
+
+.option-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+.option-name {
+  font-family: 'Bangers', cursive;
+  font-size: 1.8rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.3rem;
+}
+.option-price {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--yellow);
+  margin-bottom: 0.5rem;
+}
+.option-price span { font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+.option-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+.option-tag {
+  position: absolute;
+  top: 12px; right: 12px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 100px;
+}
+.tag-popular { background: var(--yellow); color: #000; }
+.tag-custom { background: var(--red); color: #fff; }
+
+/* QTY SELECTOR */
+.qty-section {
+  max-width: 400px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+  display: none;
+  animation: fadeUp 0.3s ease;
+}
+.qty-section.show { display: block; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.qty-label {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--yellow);
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.qty-btn {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  background: transparent;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.qty-btn:hover { background: var(--red); box-shadow: 0 0 15px rgba(224,16,16,0.5); }
+.qty-num {
+  font-family: 'Bangers', cursive;
+  font-size: 3rem;
+  color: #fff;
+  min-width: 60px;
+  text-align: center;
+  line-height: 1;
+}
+
+.qty-subtotal {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.qty-subtotal strong { color: var(--yellow); font-size: 1.3rem; }
+
+/* BUTTONS */
+.btn-fire {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, var(--red-dark), var(--red), var(--orange));
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(224,16,16,0.4);
+}
+.btn-fire:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(224,16,16,0.6); }
+.btn-fire:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-outline {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0.8rem auto 0;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.7rem 2rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.btn-outline:hover { border-color: var(--muted); color: var(--text); }
+
+/* ===== PAGE 2 — SAVEURS TURBO ===== */
+.page-header {
+  padding: 2rem 1.5rem 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.page-back {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+.page-back:hover { color: var(--text); }
+
+.caisse-tabs {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  padding: 0 1.5rem;
+  max-width: 900px;
+  margin: 0 auto 1.5rem;
+}
+.caisse-tab {
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.caisse-tab.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(224,16,16,0.4);
+}
+
+.saveurs-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+.saveur-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--card);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.progress-text { font-size: 0.9rem; color: var(--muted); }
+.progress-count { font-family: 'Bangers', cursive; font-size: 1.5rem; color: var(--yellow); }
+.progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), var(--orange));
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.brand-section { margin-bottom: 1.5rem; }
+.brand-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  padding: 0.5rem 0;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+.saveurs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.6rem;
+}
+
+.saveur-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  position: relative;
+  user-select: none;
+}
+.saveur-item:hover { border-color: rgba(224,16,16,0.4); }
+.saveur-item.selected {
+  border-color: var(--yellow);
+  background: rgba(255,215,0,0.08);
+  box-shadow: 0 0 10px rgba(255,215,0,0.2);
+}
+.saveur-item.maxed:not(.selected) { opacity: 0.4; cursor: not-allowed; }
+
+.saveur-qty-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  background: var(--red);
+  color: #fff;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: none; align-items: center; justify-content: center;
+}
+.saveur-item.selected .saveur-qty-badge { display: flex; }
+
+.saveur-emoji { font-size: 1.2rem; }
+
+/* Saveur qty controls */
+.saveur-controls {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+.saveur-item.selected .saveur-controls { display: flex; }
+.saveur-item.selected .saveur-name { max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.s-btn {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.s-btn:hover { background: rgba(255,255,255,0.15); }
+.s-qty { font-size: 0.75rem; min-width: 14px; text-align: center; font-weight: 900; }
+
+/* ===== PAGE 3 — PANIER ===== */
+.cart-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+.cart-summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.cart-card-header {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Bangers', cursive;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cart-card-body { padding: 1rem 1.2rem; }
+
+.caisse-summary {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  background: rgba(255,255,255,0.02);
+}
+.caisse-summary-title {
+  font-weight: 900;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--yellow);
+}
+.caisse-saveurs-list {
+  display: flex; flex-wrap: wrap; gap: 0.3rem;
+}
+.saveur-chip {
+  background: rgba(224,16,16,0.15);
+  border: 1px solid rgba(224,16,16,0.3);
+  color: var(--text);
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+  font-size: 0.72rem;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--border);
+}
+.total-label { font-size: 0.9rem; color: var(--muted); }
+.total-amount {
+  font-family: 'Bangers', cursive;
+  font-size: 2rem;
+  color: var(--yellow);
+  letter-spacing: 1px;
+}
+
+/* ORDER FORM */
+.form-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.form-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  margin-bottom: 1.2rem;
+  color: var(--yellow);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.form-group input, .form-group textarea {
+  background: var(--black);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.65rem 0.8rem;
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(224,16,16,0.1);
+}
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+/* ===== PAGE 4 — PAIEMENT ===== */
+.payment-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.order-number-card {
+  background: linear-gradient(135deg, var(--red-dark), #2a0000);
+  border: 2px solid var(--red);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 30px rgba(224,16,16,0.3);
+}
+.order-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.6); margin-bottom: 0.3rem; }
+.order-num {
+  font-family: 'Bangers', cursive;
+  font-size: 2.5rem;
+  letter-spacing: 4px;
+  color: var(--yellow);
+  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+
+.interac-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.interac-header {
+  background: linear-gradient(135deg, #003a00, #005a00);
+  padding: 1rem 1.2rem;
+  display: flex; align-items: center; gap: 0.8rem;
+}
+.interac-logo-text {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  color: #00d000;
+}
+.interac-body { padding: 1.2rem; }
+
+.interac-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.interac-row:last-child { border-bottom: none; }
+.i-label { color: var(--muted); }
+.i-value { font-weight: 900; }
+.i-value.green { color: #00d000; }
+
+.copy-btn {
+  background: rgba(0,208,0,0.1);
+  border: 1px solid rgba(0,208,0,0.3);
+  color: #00d000;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+.copy-btn:hover { background: rgba(0,208,0,0.2); }
+
+.interac-note {
+  padding: 0.8rem;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--yellow);
+  line-height: 1.5;
+  margin-top: 0.8rem;
+}
+
+.order-recap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+}
+.recap-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.8rem;
+  color: var(--muted);
+}
+.recap-row { display: flex; justify-content: space-between; padding: 0.3rem 0; }
+.recap-row.big { font-weight: 900; color: var(--yellow); font-size: 1rem; border-top: 1px solid var(--border); padding-top: 0.6rem; margin-top: 0.3rem; }
+
+.paid-btn {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, #003a00, #005a00, #00a000);
+  color: #fff;
+  border: 2px solid #00d000;
+  padding: 1.1rem 2rem;
+  font-family: 'Bangers', cursive;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(0,200,0,0.3);
+  margin-bottom: 1rem;
+}
+.paid-btn:hover { box-shadow: 0 8px 30px rgba(0,200,0,0.5); transform: translateY(-2px); }
+
+/* ===== PAGE 5 — MERCI ===== */
+.thanks-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+}
+
+.thanks-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  display: block;
+  animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.thanks-title {
+  font-family: 'Bangers', cursive;
+  font-size: 3rem;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #fff, var(--yellow), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+.thanks-order {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+.thanks-order strong { color: var(--yellow); }
+
+/* STARS */
+.stars-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.stars-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  color: var(--yellow);
+}
+.stars-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.star {
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+  filter: grayscale(1) opacity(0.4);
+}
+.star:hover, .star.active { filter: none; transform: scale(1.2); }
+
+.comment-area {
+  width: 100%;
+  background: var(--black);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 80px;
+  margin-bottom: 0.8rem;
+}
+.comment-area:focus { outline: none; border-color: var(--red); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--red);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  z-index: 999;
+  transition: transform 0.3s;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .options-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .saveurs-grid { grid-template-columns: repeat(2, 1fr); }
+}
 </style>
 </head>
 <body>
 
-<!-- Bannière -->
-<div class="section">
-  <img src="file:///mnt/data/1c48d257-f1f6-403f-8d11-a3769dd5124b.png" alt="Turbo Drink" style="width:80%; border-radius:20px; margin-bottom:20px;">
-  <h1>Choisis ton type de caisse</h1>
-  <button class="btn btn-simpl" onclick="choisirType('simplifie')">Caisse Simplifiée - 31,99$</button>
-  <button class="btn btn-turbo" onclick="choisirType('turbo')">Caisse Turbo Drink - 33,99$</button>
-</div>
+<div class="explosion-bg"></div>
+<div class="ray-burst"></div>
 
-<!-- Sélection du nombre de caisses -->
-<div class="section hidden" id="choix-caisse">
-  <h1>Combien de caisses ?</h1>
-  <div>
-    <button class="btn btn-simpl" onclick="modifierNombre(-1)">-</button>
-    <span class="quantity" id="nb-caisses">1</span>
-    <button class="btn btn-simpl" onclick="modifierNombre(1)">+</button>
+<!-- HEADER -->
+<header>
+  <div class="logo">⚡ Turbo Drink</div>
+  <div class="header-right">
+    <button class="cart-pill" onclick="goToCart()">
+      🛒 PANIER
+      <span class="cart-badge" id="headerCartCount">0</span>
+    </button>
   </div>
-  <button class="btn-next" onclick="allerPanier()">Continuer</button>
-</div>
+</header>
 
-<!-- Sélection des saveurs (Turbo) -->
-<div class="section hidden" id="selection-saveurs">
-  <h1>Bâtis ta caisse Turbo</h1>
-  <div id="saveur-list"></div>
-  <div class="cart-summary" id="summary-turbo">Aucune saveur sélectionnée</div>
-  <button class="btn-next" onclick="allerPanier()">Continuer</button>
-</div>
-
-<!-- Panier et paiement -->
-<div class="section hidden" id="paiement">
-  <h1>Paiement par virement</h1>
-  <p><strong>Numéro de commande :</strong> <span id="order-number"></span></p>
-  <p id="cart-detail"></p>
-  <p><strong>Montant total :</strong> <span id="montant-total"></span>$</p>
-  <p>Payer à : <span style="color:#ff4d4d;">shop.turbodrink@proton.me</span></p>
-  <p><em>Indiquez le numéro de commande dans le message du virement.</em></p>
-  <button class="btn-next" onclick="allerMerci()">J'ai payé</button>
-</div>
-
-<!-- Page remerciement -->
-<div class="section hidden" id="merci">
-  <h1>Merci pour votre commande !</h1>
-  <p>Numéro de commande : <span id="order-number-thank"></span></p>
-  <div class="stars" id="stars">
-    <span class="star" data-value="1">★</span>
-    <span class="star" data-value="2">★</span>
-    <span class="star" data-value="3">★</span>
-    <span class="star" data-value="4">★</span>
-    <span class="star" data-value="5">★</span>
+<!-- ===== PAGE 1 : CHOIX ===== -->
+<div class="page active" id="page1">
+  <div class="hero">
+    <img src="/mnt/user-data/uploads/1772482287587_turbo_drink_cover_real.png" class="hero-logo-img" alt="Turbo Drink" onerror="this.style.display='none'">
+    <div class="hero-subtitle">Boissons Énergisantes • Les Coteaux</div>
+    <div class="hero-address">📍 139 Route 338 — Dépanneur Hamel</div>
+    <div class="section-title">CHOISISSEZ <span>VOTRE</span> CAISSE</div>
+    <div class="section-sub">Chaque caisse contient 12 canettes • Ramassage en magasin</div>
   </div>
-  <textarea id="comment" rows="3" placeholder="Commentaire facultatif..." style="width:100%; margin-top:10px;"></textarea>
-  <button class="btn-next" onclick="submitReview()">Soumettre</button>
-  <button class="btn-simpl" style="margin-top:10px;" onclick="recommencer()">Commander un autre pack</button>
+
+  <div class="options-grid">
+    <div class="option-card simplifiee" onclick="selectOption('simplifiee')">
+      <span class="option-tag tag-popular">⚡ POPULAIRE</span>
+      <div class="option-icon">📦</div>
+      <div class="option-name">SIMPLIFIÉE</div>
+      <div class="option-price">31,99$ <span>/ caisse</span></div>
+      <div class="option-desc">12 canettes pré-mélangées<br>Sélection variée surprise<br>Simple & rapide</div>
+    </div>
+    <div class="option-card turbo" onclick="selectOption('turbo')">
+      <span class="option-tag tag-custom">🔥 CUSTOM</span>
+      <div class="option-icon">🎯</div>
+      <div class="option-name">TURBO DRINK</div>
+      <div class="option-price">33,99$ <span>/ caisse</span></div>
+      <div class="option-desc">Choisis tes 12 saveurs<br>Monster & Rockstar<br>100% personnalisé</div>
+    </div>
+  </div>
+
+  <div class="qty-section" id="qtySection">
+    <div class="qty-label" id="qtyLabel">COMBIEN DE CAISSES ?</div>
+    <div class="qty-controls">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <div class="qty-num" id="qtyDisplay">1</div>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+    <div class="qty-subtotal">Sous-total : <strong id="qtySubtotal">31,99$</strong></div>
+    <button class="btn-fire" id="continueBtn" onclick="continueFromQty()">CONTINUER ⚡</button>
+    <button class="btn-outline" onclick="resetSelection()">← Changer d'option</button>
+  </div>
 </div>
+
+<!-- ===== PAGE 2 : SAVEURS TURBO ===== -->
+<div class="page" id="page2">
+  <div class="page-header">
+    <div class="page-back" onclick="goTo('page1')">← Retour</div>
+    <div class="section-title">🎯 CONSTRUIS TES <span>CAISSES</span></div>
+    <div class="section-sub">Choisis 12 saveurs par caisse</div>
+  </div>
+
+  <div class="caisse-tabs" id="caisseTabs"></div>
+
+  <div class="saveurs-container">
+    <div class="saveur-progress">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="progress-text" id="progressText">Caisse 1 — saveurs sélectionnées</span>
+          <span class="progress-count"><span id="progressCount">0</span>/12</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="saveursGrid"></div>
+
+    <button class="btn-fire" id="saveursContinueBtn" onclick="saveCurrentCaisseAndContinue()" disabled style="margin-top:1.5rem">
+      CONTINUER ⚡
+    </button>
+  </div>
+</div>
+
+<!-- ===== PAGE 3 : PANIER / RÉSUMÉ ===== -->
+<div class="page" id="page3">
+  <div class="page-header">
+    <div class="page-back" onclick="goBackFromCart()">← Modifier</div>
+    <div class="section-title">🛒 VOTRE <span>PANIER</span></div>
+  </div>
+
+  <div class="cart-container">
+    <div class="cart-summary-card">
+      <div class="cart-card-header">
+        <span id="cartTypeLabel">COMMANDE</span>
+        <span id="cartCaisseCount"></span>
+      </div>
+      <div class="cart-card-body" id="cartBodyContent"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-title">📋 VOS INFORMATIONS</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input type="text" id="fPrenom" placeholder="Jean">
+        </div>
+        <div class="form-group">
+          <label>Nom *</label>
+          <input type="text" id="fNom" placeholder="Tremblay">
+        </div>
+        <div class="form-group full">
+          <label>Téléphone *</label>
+          <input type="tel" id="fTel" placeholder="450-555-0000">
+        </div>
+        <div class="form-group full">
+          <label>Courriel *</label>
+          <input type="email" id="fEmail" placeholder="jean@email.com">
+        </div>
+        <div class="form-group full">
+          <label>Note (optionnel)</label>
+          <textarea id="fNote" placeholder="Ex: disponible le soir après 18h..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-fire" onclick="goToPayment()">PROCÉDER AU PAIEMENT ⚡</button>
+  </div>
+</div>
+
+<!-- ===== PAGE 4 : PAIEMENT ===== -->
+<div class="page" id="page4">
+  <div class="page-header">
+    <div class="section-title">💳 <span>PAIEMENT</span> INTERAC</div>
+  </div>
+
+  <div class="payment-container">
+    <div class="order-number-card">
+      <div class="order-label">Numéro de commande</div>
+      <div class="order-num" id="orderNum">TD-000000</div>
+    </div>
+
+    <div class="order-recap" id="paymentRecap"></div>
+
+    <div class="interac-card">
+      <div class="interac-header">
+        <div style="font-size:1.8rem">💚</div>
+        <div class="interac-logo-text">VIREMENT INTERAC</div>
+      </div>
+      <div class="interac-body">
+        <div class="interac-row">
+          <span class="i-label">Courriel</span>
+          <div style="display:flex;align-items:center">
+            <span class="i-value green" id="interac-email">votremail@email.com</span>
+            <button class="copy-btn" onclick="copyVal('interac-email')">COPIER</button>
+          </div>
+        </div>
+        <div class="interac-row">
+          <span class="i-label">Destinataire</span>
+          <span class="i-value">Votre Nom</span>
+        </div>
+        <div class="interac-row">
+          <span class="i-label">Montant exact</span>
+          <span class="i-value green" id="interac-amount">—</span>
+        </div>
+        <div class="interac-row">
+          <span class="i-label">Message obligatoire</span>
+          <span class="i-value" style="font-size:0.82rem" id="interac-msg">—</span>
+        </div>
+        <div class="interac-note">
+          ⚠️ Inscrivez votre <strong>numéro de commande</strong> dans le message du virement pour que nous puissions confirmer rapidement.
+        </div>
+      </div>
+    </div>
+
+    <button class="paid-btn" onclick="goToThanks()">✅ J'AI ENVOYÉ LE PAIEMENT</button>
+    <button class="btn-outline" onclick="goTo('page3')">← Modifier ma commande</button>
+  </div>
+</div>
+
+<!-- ===== PAGE 5 : MERCI ===== -->
+<div class="page" id="page5">
+  <div class="thanks-container">
+    <span class="thanks-icon">⚡</span>
+    <div class="thanks-title">MERCI !</div>
+    <div class="thanks-order">Commande <strong id="thanksOrderNum">TD-000000</strong> — Confirmée</div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1.5rem;font-size:0.88rem;color:var(--muted);line-height:1.7;text-align:left;">
+      📍 <strong style="color:var(--text)">Ramassage :</strong> 139 Route 338, Les Coteaux<br>
+      🏪 <strong style="color:var(--text)">Dépanneur Hamel</strong><br>
+      📱 Nous vous contacterons pour confirmer la disponibilité.
+    </div>
+
+    <div class="stars-section">
+      <div class="stars-title">⭐ ÉVALUEZ VOTRE EXPÉRIENCE</div>
+      <div class="stars-row" id="starsRow">
+        <span class="star" data-val="1" onclick="rateStar(1)">★</span>
+        <span class="star" data-val="2" onclick="rateStar(2)">★</span>
+        <span class="star" data-val="3" onclick="rateStar(3)">★</span>
+        <span class="star" data-val="4" onclick="rateStar(4)">★</span>
+        <span class="star" data-val="5" onclick="rateStar(5)">★</span>
+      </div>
+      <textarea class="comment-area" id="commentArea" placeholder="Commentaire facultatif..."></textarea>
+      <button class="btn-fire" onclick="submitRating()" style="max-width:none">ENVOYER MON AVIS ⚡</button>
+    </div>
+
+    <button class="btn-fire" onclick="resetAll()" style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);box-shadow:none;border:1px solid var(--border);color:var(--text)">
+      🔄 COMMANDER UN AUTRE PACK
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-let typeCommande = '';
-let nbCaisses = 1;
-let saveursTurbo = {};
-let currentOrder = {};
-const listeSaveurs = ['Monster Original','Monster Ultra','Monster Pipeline Punch','Rockstar Original','Rockstar Punched']; // exemples
+// ===== DATA =====
+const FLAVORS = {
+  monster: [
+    { id:'m1', name:'Original', emoji:'🟢' },
+    { id:'m2', name:'Lo-Carb', emoji:'🔵' },
+    { id:'m3', name:'Assault', emoji:'🔴' },
+    { id:'m4', name:'Ultra White', emoji:'⚪' },
+    { id:'m5', name:'Ultra Red', emoji:'🔴' },
+    { id:'m6', name:'Ultra Blue', emoji:'💙' },
+    { id:'m7', name:'Ultra Gold', emoji:'💛' },
+    { id:'m8', name:'Ultra Sunrise', emoji:'🌅' },
+    { id:'m9', name:'Ultra Watermelon', emoji:'🍉' },
+    { id:'m10', name:'Ultra Paradise', emoji:'🌴' },
+    { id:'m11', name:'Ultra Peachy Keen', emoji:'🍑' },
+    { id:'m12', name:'Ultra Violet', emoji:'💜' },
+    { id:'m13', name:'Mango Loco', emoji:'🥭' },
+    { id:'m14', name:'Pipeline Punch', emoji:'🍹' },
+    { id:'m15', name:'Khaotic', emoji:'🍊' },
+    { id:'m16', name:'Aussie Lemonade', emoji:'🍋' },
+    { id:'m17', name:'Reserve Orange', emoji:'🟠' },
+    { id:'m18', name:'Reserve Watermelon', emoji:'🍈' },
+    { id:'m19', name:'Java Mean Bean', emoji:'☕' },
+    { id:'m20', name:'Java Loca Moca', emoji:'🍫' },
+    { id:'m21', name:'Java Irish Blend', emoji:'🎩' },
+  ],
+  rockstar: [
+    { id:'r1', name:'Original', emoji:'⭐' },
+    { id:'r2', name:'Sugar Free', emoji:'🔶' },
+    { id:'r3', name:'Silver Ice', emoji:'🩶' },
+    { id:'r4', name:'Punched Tropical', emoji:'🌺' },
+    { id:'r5', name:'Punched Strawberry Kiwi', emoji:'🍓' },
+    { id:'r6', name:'Punched Mango', emoji:'🥭' },
+    { id:'r7', name:'Punched Lime Freeze', emoji:'🍈' },
+    { id:'r8', name:'Boom Piña Colada', emoji:'🥥' },
+    { id:'r9', name:'Boom Whipped Orange', emoji:'🟧' },
+    { id:'r10', name:'Revolt Killer Citrus', emoji:'🍋' },
+    { id:'r11', name:'Revolt Killer Grape', emoji:'🍇' },
+    { id:'r12', name:'Revolt Killer Raspberry', emoji:'🫐' },
+    { id:'r13', name:'Recovery Lemonade', emoji:'💛' },
+    { id:'r14', name:'Recovery Orange', emoji:'🍊' },
+  ]
+};
 
-function choisirType(type) {
-  typeCommande = type;
-  document.querySelector('.section').classList.add('hidden');
-  document.getElementById('choix-caisse').classList.remove('hidden');
+const PRICES = { simplifiee: 31.99, turbo: 33.99 };
 
-  if(typeCommande === 'turbo') {
-    afficherSaveurs();
+let state = {
+  option: null,
+  qty: 1,
+  caisses: [], // [{saveurs: [{id, name, emoji, qty}]}]
+  currentCaisse: 0,
+  client: {},
+  orderNum: '',
+  rating: 0
+};
+
+// ===== UTILS =====
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function formatPrice(n) {
+  return n.toFixed(2).replace('.', ',') + '$';
+}
+
+function generateOrderNum() {
+  return 'TD-' + Math.floor(100000 + Math.random() * 900000);
+}
+
+function updateHeaderCart() {
+  let total = 0;
+  if (state.option && state.qty > 0) {
+    total = state.qty;
   }
+  document.getElementById('headerCartCount').textContent = total;
 }
 
-function modifierNombre(delta) {
-  nbCaisses += delta;
-  if(nbCaisses<1) nbCaisses=1;
-  document.getElementById('nb-caisses').textContent = nbCaisses;
+// ===== PAGE 1 =====
+function selectOption(opt) {
+  state.option = opt;
+  state.qty = 1;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector('.option-card.' + opt).classList.add('selected');
+
+  const qtySection = document.getElementById('qtySection');
+  qtySection.classList.add('show');
+  updateQtyDisplay();
 }
 
-function afficherSaveurs() {
-  const container = document.getElementById('saveur-list');
-  container.innerHTML = '';
-  listeSaveurs.forEach((s,i)=>{
-    const div = document.createElement('div');
-    div.className='product-select';
-    div.innerHTML = `
-      <span>${s}</span>
-      <button class="btn btn-simpl" onclick="changeSaveur('${s}', -1)">-</button>
-      <span id="qty-${i}">0</span>
-      <button class="btn btn-turbo" onclick="changeSaveur('${s}', 1)">+</button>
-    `;
-    container.appendChild(div);
-    saveursTurbo[s]=0;
-  });
+function changeQty(delta) {
+  state.qty = Math.max(1, Math.min(10, state.qty + delta));
+  updateQtyDisplay();
 }
 
-function changeSaveur(s,delta) {
-  saveursTurbo[s] += delta;
-  if(saveursTurbo[s]<0) saveursTurbo[s]=0;
-  document.getElementById(`qty-${listeSaveurs.indexOf(s)}`).textContent = saveursTurbo[s];
-  updateSummaryTurbo();
+function updateQtyDisplay() {
+  const price = state.option ? PRICES[state.option] : 0;
+  document.getElementById('qtyDisplay').textContent = state.qty;
+  document.getElementById('qtySubtotal').textContent = formatPrice(price * state.qty);
 }
 
-function updateSummaryTurbo() {
-  const selected = Object.entries(saveursTurbo).filter(([k,v])=>v>0).map(([k,v])=>`${k} x${v}`);
-  document.getElementById('summary-turbo').textContent = selected.length? selected.join(', '): 'Aucune saveur sélectionnée';
-}
-
-function allerPanier() {
-  document.getElementById('choix-caisse').classList.add('hidden');
-  if(typeCommande==='turbo') document.getElementById('selection-saveurs').classList.remove('hidden');
-  else {
-    // Simplifiée passe directement au paiement
-    preparePaiement();
-  }
-  if(typeCommande==='turbo') {
-    const totalSaveurs = Object.values(saveursTurbo).reduce((a,b)=>a+b,0);
-    if(totalSaveurs>0) preparePaiement();
-}
-
-function preparePaiement() {
-  document.getElementById('selection-saveurs').classList.add('hidden');
-  document.getElementById('paiement').classList.remove('hidden');
-
-  const numero = 'TDB-' + Math.floor(Math.random()*1000).toString().padStart(3,'0');
-  currentOrder.numero = numero;
-  document.getElementById('order-number').textContent = numero;
-
-  if(typeCommande==='simplifie') {
-    document.getElementById('cart-detail').textContent = `Caisse Simplifiée x${nbCaisses}`;
-    document.getElementById('montant-total').textContent = (31.99*nbCaisses).toFixed(2);
+function continueFromQty() {
+  if (!state.option) return;
+  if (state.option === 'simplifiee') {
+    buildCartPage();
+    goTo('page3');
   } else {
-    const details = Object.entries(saveursTurbo).filter(([k,v])=>v>0).map(([k,v])=>`${k} x${v}`).join(', ');
-    document.getElementById('cart-detail').textContent = `Caisse Turbo x${nbCaisses} : ${details}`;
-    document.getElementById('montant-total').textContent = (33.99*nbCaisses).toFixed(2);
+    buildTurboCaisses();
+    goTo('page2');
   }
+  updateHeaderCart();
 }
 
-function allerMerci() {
-  document.getElementById('paiement').classList.add('hidden');
-  document.getElementById('merci').classList.remove('hidden');
-  document.getElementById('order-number-thank').textContent = currentOrder.numero;
+function resetSelection() {
+  state.option = null;
+  state.qty = 1;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('qtySection').classList.remove('show');
 }
 
-// Étoiles
-const stars = document.querySelectorAll('.star');
-let note = 0;
-stars.forEach(star=>{
-  star.addEventListener('click', ()=>{
-    note = parseInt(star.dataset.value);
-    stars.forEach(s=>s.classList.toggle('selected', parseInt(s.dataset.value)<=note));
+// ===== PAGE 2 — SAVEURS =====
+function buildTurboCaisses() {
+  state.caisses = [];
+  for (let i = 0; i < state.qty; i++) {
+    state.caisses.push({ saveurs: {} }); // { flavorId: qty }
+  }
+  state.currentCaisse = 0;
+  renderCaisseTabs();
+  renderSaveurs();
+}
+
+function renderCaisseTabs() {
+  const tabs = document.getElementById('caisseTabs');
+  tabs.innerHTML = state.caisses.map((c, i) => {
+    const total = Object.values(c.saveurs).reduce((a,b) => a+b, 0);
+    const done = total === 12;
+    return `<button class="caisse-tab ${i === state.currentCaisse ? 'active' : ''}" onclick="switchCaisse(${i})">
+      Caisse ${i+1} ${done ? '✅' : `(${total}/12)`}
+    </button>`;
+  }).join('');
+}
+
+function switchCaisse(idx) {
+  state.currentCaisse = idx;
+  renderCaisseTabs();
+  renderSaveurs();
+}
+
+function getCaisseTotal() {
+  return Object.values(state.caisses[state.currentCaisse].saveurs).reduce((a,b) => a+b, 0);
+}
+
+function renderSaveurs() {
+  const caisse = state.caisses[state.currentCaisse];
+  const total = getCaisseTotal();
+
+  // Progress
+  document.getElementById('progressCount').textContent = total;
+  document.getElementById('progressBar').style.width = (total / 12 * 100) + '%';
+
+  const continueBtn = document.getElementById('saveursContinueBtn');
+  const allDone = state.caisses.every(c => Object.values(c.saveurs).reduce((a,b)=>a+b,0) === 12);
+  continueBtn.disabled = !allDone;
+  continueBtn.textContent = allDone ? 'ALLER AU PANIER ⚡' : `SÉLECTIONNE 12 SAVEURS (${total}/12)`;
+
+  const grid = document.getElementById('saveursGrid');
+  const maxed = total >= 12;
+
+  let html = '';
+  ['monster', 'rockstar'].forEach(brand => {
+    html += `<div class="brand-section">
+      <div class="brand-title">
+        ${brand === 'monster' ? '🟢 Monster Energy' : '⭐ Rockstar Energy'}
+      </div>
+      <div class="saveurs-grid">`;
+    FLAVORS[brand].forEach(f => {
+      const qty = caisse.saveurs[f.id] || 0;
+      const selected = qty > 0;
+      const isMaxed = maxed && !selected;
+      html += `<div class="saveur-item ${selected ? 'selected' : ''} ${isMaxed ? 'maxed' : ''}" onclick="toggleSaveur('${f.id}', '${brand}')">
+        <span class="saveur-emoji">${f.emoji}</span>
+        <span class="saveur-name">${f.name}</span>
+        ${selected ? `
+        <div class="saveur-controls" onclick="event.stopPropagation()">
+          <button class="s-btn" onclick="adjSaveur('${f.id}', -1)">−</button>
+          <span class="s-qty">${qty}</span>
+          <button class="s-btn" onclick="adjSaveur('${f.id}', 1)">+</button>
+        </div>` : ''}
+      </div>`;
+    });
+    html += `</div></div>`;
   });
-});
 
-function submitReview() {
-  const comment = document.getElementById('comment').value;
-  alert(`Merci pour votre avis!\nNote: ${note} étoiles\nCommentaire: ${comment}`);
-  recommencer();
+  grid.innerHTML = html;
 }
 
-function recommencer() {
-  nbCaisses=1;
-  typeCommande='';
-  saveursTurbo={};
-  note=0;
-  document.getElementById('stars').querySelectorAll('.star').forEach(s=>s.classList.remove('selected'));
-  document.getElementById('comment').value='';
-  document.getElementById('merci').classList.add('hidden');
-  document.querySelector('.section').classList.remove('hidden');
+function toggleSaveur(id, brand) {
+  const caisse = state.caisses[state.currentCaisse];
+  const total = getCaisseTotal();
+  if (caisse.saveurs[id]) {
+    delete caisse.saveurs[id];
+  } else {
+    if (total >= 12) { showToast('12/12 atteint ! Retire une saveur d\'abord.'); return; }
+    caisse.saveurs[id] = 1;
+  }
+  renderCaisseTabs();
+  renderSaveurs();
+}
+
+function adjSaveur(id, delta) {
+  const caisse = state.caisses[state.currentCaisse];
+  const total = getCaisseTotal();
+  const cur = caisse.saveurs[id] || 0;
+  if (delta > 0 && total >= 12) { showToast('Maximum 12 canettes par caisse !'); return; }
+  const newVal = cur + delta;
+  if (newVal <= 0) { delete caisse.saveurs[id]; }
+  else { caisse.saveurs[id] = newVal; }
+  renderCaisseTabs();
+  renderSaveurs();
+}
+
+function saveCurrentCaisseAndContinue() {
+  buildCartPage();
+  goTo('page3');
+}
+
+// ===== PAGE 3 — PANIER =====
+function buildCartPage() {
+  const price = PRICES[state.option];
+  const total = price * state.qty;
+  const typeLabel = state.option === 'simplifiee' ? 'OPTION SIMPLIFIÉE' : 'OPTION TURBO DRINK';
+
+  document.getElementById('cartTypeLabel').textContent = typeLabel;
+  document.getElementById('cartCaisseCount').textContent = `${state.qty} caisse${state.qty > 1 ? 's' : ''}`;
+
+  let bodyHtml = '';
+  if (state.option === 'simplifiee') {
+    bodyHtml = `<div style="color:var(--muted);font-size:0.9rem;padding:0.5rem 0;margin-bottom:1rem">
+      📦 ${state.qty} caisse${state.qty > 1 ? 's' : ''} pré-mélangée${state.qty > 1 ? 's' : ''} — 12 canettes variées chacune
+    </div>`;
+  } else {
+    state.caisses.forEach((caisse, i) => {
+      const chips = Object.entries(caisse.saveurs).map(([id, qty]) => {
+        const f = [...FLAVORS.monster, ...FLAVORS.rockstar].find(x => x.id === id);
+        return f ? `<span class="saveur-chip">${f.emoji} ${f.name} ×${qty}</span>` : '';
+      }).join('');
+      bodyHtml += `<div class="caisse-summary">
+        <div class="caisse-summary-title">Caisse ${i+1}</div>
+        <div class="caisse-saveurs-list">${chips}</div>
+      </div>`;
+    });
+  }
+
+  bodyHtml += `<div class="total-line">
+    <span class="total-label">${state.qty} × ${formatPrice(price)}</span>
+    <span class="total-amount">${formatPrice(total)}</span>
+  </div>`;
+
+  document.getElementById('cartBodyContent').innerHTML = bodyHtml;
+}
+
+function goBackFromCart() {
+  if (state.option === 'turbo') goTo('page2');
+  else goTo('page1');
+}
+
+function goToCart() {
+  if (!state.option) { showToast('Choisissez une option d\'abord !'); return; }
+  buildCartPage();
+  goTo('page3');
+}
+
+// ===== PAGE 4 — PAIEMENT =====
+function goToPayment() {
+  const prenom = document.getElementById('fPrenom').value.trim();
+  const nom = document.getElementById('fNom').value.trim();
+  const tel = document.getElementById('fTel').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  if (!prenom || !nom || !tel || !email) {
+    showToast('Remplis tous les champs obligatoires !');
+    return;
+  }
+  state.client = { prenom, nom, tel, email, note: document.getElementById('fNote').value };
+  state.orderNum = generateOrderNum();
+
+  document.getElementById('orderNum').textContent = state.orderNum;
+  document.getElementById('thanksOrderNum').textContent = state.orderNum;
+
+  const price = PRICES[state.option];
+  const total = price * state.qty;
+  const typeLabel = state.option === 'simplifiee' ? 'Option Simplifiée' : 'Option Turbo Drink';
+
+  document.getElementById('interac-amount').textContent = formatPrice(total);
+  document.getElementById('interac-msg').textContent = `${state.orderNum} — ${prenom} ${nom}`;
+
+  const recap = document.getElementById('paymentRecap');
+  recap.innerHTML = `<div class="recap-title">RÉSUMÉ</div>
+    <div class="recap-row"><span>Type</span><span>${typeLabel}</span></div>
+    <div class="recap-row"><span>Caisses</span><span>${state.qty}</span></div>
+    <div class="recap-row"><span>Client</span><span>${prenom} ${nom}</span></div>
+    <div class="recap-row"><span>Téléphone</span><span>${tel}</span></div>
+    <div class="recap-row big"><span>TOTAL</span><span>${formatPrice(total)}</span></div>`;
+
+  goTo('page4');
+}
+
+// ===== PAGE 5 — MERCI =====
+function goToThanks() {
+  goTo('page5');
+}
+
+function rateStar(val) {
+  state.rating = val;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < val);
+  });
+}
+
+function submitRating() {
+  if (!state.rating) { showToast('Choisis une note d\'abord !'); return; }
+  showToast('Merci pour votre avis ! ⭐');
+  document.querySelector('.stars-section').innerHTML = `<div style="text-align:center;padding:1rem;color:var(--yellow);font-family:'Bangers',cursive;font-size:1.5rem;letter-spacing:2px">
+    MERCI POUR VOTRE AVIS ! ${'⭐'.repeat(state.rating)}
+  </div>`;
+}
+
+function resetAll() {
+  state = { option: null, qty: 1, caisses: [], currentCaisse: 0, client: {}, orderNum: '', rating: 0 };
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('qtySection').classList.remove('show');
+  document.getElementById('headerCartCount').textContent = '0';
+  // Reset form
+  ['fPrenom','fNom','fTel','fEmail','fNote'].forEach(id => { document.getElementById(id).value = ''; });
+  goTo('page1');
+}
+
+function copyVal(elId) {
+  const el = document.getElementById(elId);
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = el.nextElementSibling;
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
 }
 </script>
-
 </body>
 </html>
